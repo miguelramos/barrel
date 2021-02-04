@@ -1,6 +1,9 @@
 package config
 
 import (
+	"os"
+	"path"
+
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -18,6 +21,9 @@ type EnvironmentConfig struct {
 	BarrelMinioSecretKey    string `env:"BARREL_MINIO_SECRET_KEY" mapstructure:"minio_secret_key"`
 	BarrelMinioPort         string `env:"BARREL_MINIO_PORT" mapstructure:"minio_port"`
 	BarrelMinioURL          string `env:"BARREL_MINIO_URL" mapstructure:"minio_url"`
+	BarrelRolesPath         string `env:"BARREL_ADMIN_ROLES_PATH" mapstructure:"admin_roles_path"`
+	BarrelAdminRole         string `env:"BARREL_ADMIN_ROLE" mapstructure:"admin_role"`
+	BarrelAdminKey          string `env:"BARREL_ADMIN_KEY" mapstructure:"admin_key"`
 }
 
 // LoadEnvironmentConfig load config from env
@@ -44,8 +50,11 @@ func loadDefault(viper *viper.Viper) {
 }
 
 func loadEnv(viper *viper.Viper) {
+	dir, _ := os.Getwd()
+	envfile := path.Join(dir, ".env")
+
 	viper.SetEnvPrefix("barrel")
-	viper.SetConfigFile("../.env")
+	viper.SetConfigFile(envfile)
 
 	viper.AutomaticEnv()
 	viper.BindEnv("MINIO_PORT")
@@ -59,6 +68,9 @@ func loadEnv(viper *viper.Viper) {
 	viper.BindEnv("JWT_SECRET")
 	viper.BindEnv("BASE_URL")
 	viper.BindEnv("GOTRUE_URL")
+	viper.BindEnv("ADMIN_ROLES_PATH")
+	viper.BindEnv("ADMIN_ROLE")
+	viper.BindEnv("ADMIN_KEY")
 
 	loadDefault(viper)
 

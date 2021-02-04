@@ -8,6 +8,53 @@ import (
 	"github.com/pkg/errors"
 )
 
+//PolicyType types for policies
+type PolicyType string
+
+//Types of policies to apply when creating
+const (
+	AnonymousPolicy PolicyType = "ANONYMOUS_POLICY"
+	ReaderPolicy    PolicyType = "READER_POLICY"
+	WriterPolicy    PolicyType = "WRITER_POLICY"
+	ManagerPolicy   PolicyType = "MANAGER_POLICY"
+	OwnerPolicy     PolicyType = "OWNER_POLICY"
+	AdminPolicy     PolicyType = "ADMIN_POLICY"
+)
+
+//GetPolicyType get defined type
+func GetPolicyType(policy string) PolicyType {
+	types := map[string]PolicyType{
+		"ANONYMOUS_POLICY": AnonymousPolicy,
+		"READER_POLICY":    ReaderPolicy,
+		"WRITER_POLICY":    WriterPolicy,
+		"MANAGER_POLICY":   ManagerPolicy,
+		"OWNER_POLICY":     OwnerPolicy,
+		"ADMIN_POLICY":     AdminPolicy,
+	}
+
+	return types[policy]
+}
+
+// CreatePolicy create one of the Policy types
+func CreatePolicy(policy PolicyType, bucket string) (*iampolicy.Policy, error) {
+	switch policy {
+	case AnonymousPolicy:
+		return CreateAnonymousPolicy(bucket)
+	case ReaderPolicy:
+		return CreateReaderPolicy(bucket)
+	case WriterPolicy:
+		return CreateWriterPolicy(bucket)
+	case ManagerPolicy:
+		return CreateManagerPolicy(bucket)
+	case OwnerPolicy:
+		return CreateOwnerPolicy(bucket)
+	case AdminPolicy:
+		return CreateAdminPolicy(bucket)
+	}
+
+	return nil, errors.New("Invalid policy type")
+}
+
 // CreateAnonymousPolicy read-only bucket objects
 func CreateAnonymousPolicy(bucket string) (*iampolicy.Policy, error) {
 	policyString := fmt.Sprintf(`{

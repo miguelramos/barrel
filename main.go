@@ -23,7 +23,11 @@ func boot() {
 	defer db.Close()
 
 	app := config.BootApplication()
-	client := config.OpenClient(env)
+
+	client, err := config.OpenClient(env)
+	if err != nil {
+		logrus.Fatalf("Error opening minio: %+v", err)
+	}
 
 	api.WithVersion(app, env, db, client)
 

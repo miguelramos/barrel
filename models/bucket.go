@@ -19,6 +19,7 @@ type Bucket struct {
 	Bucket    nulls.String `json:"path,omitempty" db:"bucket"`
 	OrgID     nulls.String `json:"orgId,omitempty" db:"org_id"`
 	IsPrivate bool         `json:"isPrivate" db:"is_private"`
+	Policy    string       `json:"policy" db:"-"`
 	CreatedAt time.Time    `json:"createdAt" db:"created_at"`
 	UpdatedAt time.Time    `json:"updatedAt" db:"updated_at"`
 	DeletedAt nulls.Time   `json:"deleteAt,omitempty" db:"deleted_at"`

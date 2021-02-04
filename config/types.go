@@ -5,34 +5,23 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-type MetaClaimerRoles struct {
-	AllowedRoles []string `json:"allowed_roles"`
-	DefaultRule  string   `json:"default_rule"`
-	UserID       string   `json:"user_id"`
-}
-
-type MetaClaimer struct {
-	Claims MetaClaimerRoles `json:"claims"`
-}
-
-type UserMetaClaim struct {
-	Meta    MetaClaimer            `json:"meta"`
-	Profile map[string]interface{} `json:"profile"`
-}
-
 type GoTrueClaims struct {
 	jwt.StandardClaims
 	Email        string                 `json:"email"`
 	AppMetaData  map[string]interface{} `json:"app_metadata"`
-	UserMetaData UserMetaClaim          `json:"user_metadata"`
+	UserMetaData map[string]interface{} `json:"user_metadata"`
 }
 
 type Identity struct {
-	ID        uuid.UUID `json:"id,omitempty"`
-	UserID    uuid.UUID `json:"userID,omitempty"`
-	AccessKey string    `json:"accessKey,omitempty"`
-	SecretKey string    `json:"secretKey,omitempty"`
-	Token     string    `json:"token,omitempty"`
+	AccessKey string `json:"accessKey,omitempty"`
+	SecretKey string `json:"secretKey,omitempty"`
+}
+
+type GoTrueIdentity struct {
+	Identity
+	ID     uuid.UUID `json:"id,omitempty"`
+	UserID uuid.UUID `json:"userID,omitempty"`
+	Token  string    `json:"token,omitempty"`
 }
 
 type BucketPolicy struct {

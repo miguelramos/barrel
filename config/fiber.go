@@ -37,6 +37,7 @@ func BootApplication() *fiber.App {
 	return app
 }
 
+// ErrorHandler handle fiber errors
 func ErrorHandler(ctx *fiber.Ctx, err error) error {
 	// Statuscode defaults to 500
 	code := fiber.StatusInternalServerError

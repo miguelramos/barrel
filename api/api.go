@@ -7,6 +7,7 @@ import (
 	"github.com/websublime/barrel/storage"
 )
 
+// API api instance
 type API struct {
 	db     *storage.Connection
 	config *config.EnvironmentConfig
@@ -14,6 +15,7 @@ type API struct {
 	app    *fiber.App
 }
 
+// WithVersion api with version prefix
 func WithVersion(app *fiber.App, conf *config.EnvironmentConfig, db *storage.Connection, store *minio.Client) {
 	api := &API{
 		db:     db,
@@ -23,16 +25,24 @@ func WithVersion(app *fiber.App, conf *config.EnvironmentConfig, db *storage.Con
 	}
 
 	publicRouter := app.Group("/v1")
-	privateRouter := publicRouter.Group("/org")
+	privateRouter := publicRouter.Group("/org", api.AuthorizedMiddleware, api.AdminMiddleware, api.CanAccessMiddleware)
 
-	NewPublicApi(api, publicRouter)
-	NewPrivateApi(api, privateRouter)
+	NewPublicAPI(api, publicRouter)
+	NewPrivateAPI(api, privateRouter)
 }
 
-func NewPublicApi(api *API, router fiber.Router) {
+// NewPublicAPI public routes
+func NewPublicAPI(api *API, router fiber.Router) {
 	router.Get("", api.HealthCheck)
 }
 
-func NewPrivateApi(api *API, router fiber.Router) {
-	// TODO: private
+// NewPrivateAPI private routes
+func NewPrivateAPI(api *API, router fiber.Router) {
+	router.Get("", api.HealthCheck)
+
+	bucketRouter := router.Group("/bucket")
+	bucketRouter.Post("", api.CreateBucket)
+
+	userRouter := router.Group("/user")
+	userRouter.Post("", api.CreateUser)
 }
