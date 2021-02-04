@@ -9,8 +9,8 @@ import (
 )
 
 func OpenClient(conf *EnvironmentConfig) *minio.Client {
-	minioClient, err := minio.New(conf.MinioURL, &minio.Options{
-		Creds:  credentials.NewStaticV4(conf.MinioAccessKey, conf.MinioSecretKey, ""),
+	minioClient, err := minio.New(conf.BarrelMinioURL, &minio.Options{
+		Creds:  credentials.NewStaticV4(conf.BarrelMinioAccessKey, conf.BarrelMinioSecretKey, ""),
 		Secure: false,
 	})
 
@@ -22,7 +22,7 @@ func OpenClient(conf *EnvironmentConfig) *minio.Client {
 }
 
 func OpenAdminClient(conf *EnvironmentConfig) (*madmin.AdminClient, error) {
-	minioAdmin, err := madmin.New(conf.MinioURL, conf.MinioAccessKey, conf.MinioSecretKey, false)
+	minioAdmin, err := madmin.New(conf.BarrelMinioURL, conf.BarrelMinioAccessKey, conf.BarrelMinioSecretKey, false)
 
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func OpenAdminClient(conf *EnvironmentConfig) (*madmin.AdminClient, error) {
 }
 
 func NewClient(conf *EnvironmentConfig, key string, secret string, token string) (*minio.Client, error) {
-	minioClient, err := minio.New(conf.MinioURL, &minio.Options{
+	minioClient, err := minio.New(conf.BarrelMinioURL, &minio.Options{
 		Creds:  credentials.NewStaticV4(key, secret, token),
 		Secure: false,
 	})

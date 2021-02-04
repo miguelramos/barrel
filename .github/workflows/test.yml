@@ -1,0 +1,29 @@
+on: [push, pull_request]
+name: Test
+env:
+  BARREL_MINIO_PORT: "9876"
+  BARREL_MINIO_URL: "localhost:9876"
+  BARREL_MINIO_ACCESS_KEY: "A5a0a87b725552daXd"
+  BARREL_MINIO_SECRET_KEY: "369f5e7b4a41e25452c353D629a24c372b62c90"
+  BARREL_PORT: "9078"
+  BARREL_HOST: "localhost"
+  BARREL_DATABASE_URL: "postgres://postgres:postgres@database:5432/postgres?sslmode=disable"
+  BARREL_DATABASE_NAMESPACE: "storage"
+  BARREL_JWT_SECRET: "3EK6FD+o0+c7tzBNVfjpMkNDi2yARAAKzQlk8O2IKoxQu4nF7EdAh8s3TwpHwrdWT6R"
+  BARREL_BASE_URL: "http://localhost:9078"
+jobs:
+  test:
+    strategy:
+      matrix:
+        go-version: [1.15.x]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go-version }}
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Test
+      run: go test ./...
