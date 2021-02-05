@@ -33,8 +33,37 @@ type GoTrueIdentity struct {
 	Token  string    `json:"token,omitempty"`
 }
 
-type BucketPolicy struct {
+type CannedPolicy struct {
+	Name   string `json:"name"`
+	Policy string `json:"policy"`
 	Bucket string `json:"bucket"`
+}
+
+func (canned *CannedPolicy) Validate() *validate.Errors {
+	return validate.Validate(
+		&validators.StringIsPresent{Field: canned.Name, Name: "Name", Message: "Policy name is missing"},
+		&validators.StringIsPresent{Field: canned.Policy, Name: "Policy", Message: "Policy type is missing"},
+		&validators.StringIsPresent{Field: canned.Bucket, Name: "Bucket", Message: "Bucket is missing"},
+	)
+}
+
+func (canned *CannedPolicy) ValidatePolicy() *validate.Errors {
+	return validate.Validate(
+		&validators.StringIsPresent{Field: canned.Policy, Name: "Policy", Message: "Policy type is missing"},
+		&validators.StringIsPresent{Field: canned.Bucket, Name: "Bucket", Message: "Bucket is missing"},
+	)
+}
+
+type IdentityPolicy struct {
+	AccessKey  string `json:"accessKey"`
+	PolicyName string `json:"policyName"`
+}
+
+func (ip *IdentityPolicy) Validate() *validate.Errors {
+	return validate.Validate(
+		&validators.StringIsPresent{Field: ip.AccessKey, Name: "AccessKey", Message: "Access key is missing"},
+		&validators.StringIsPresent{Field: ip.PolicyName, Name: "PolicyName", Message: "Policy name is missing"},
+	)
 }
 
 type MetaFile struct {

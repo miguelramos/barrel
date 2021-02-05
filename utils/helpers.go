@@ -18,6 +18,7 @@ const (
 	ErrorOrgUserFailure          = "EORG_USERFAILURE"
 	ErrorOrgPolicyCreate         = "EORG_POLICYCREATE"
 	ErrorOrgPolicyUser           = "EORG_POLICYUSER"
+	ErrorOrgPolicyFailure        = "EORG_POLICYFAILURE"
 	ErrorInvalidBody             = "ERESPONSE_INVALIDBODY"
 	ErrorParseJson               = "EJSON_PARSE"
 	ErrorResourceForbidden       = "ERESOURCE_FORBIDDEN"

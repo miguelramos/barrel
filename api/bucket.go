@@ -53,11 +53,6 @@ func (api *API) CreateBucket(ctx *fiber.Ctx) error {
 		bucketName.WriteString(slug.Make(bucket.Bucket.String))
 	}
 
-	_, policy, err := CreatePolicy(policyType, bucketName.String())
-	if err != nil {
-		return utils.NewException(utils.ErrorBucketCreation, fiber.StatusBadRequest, err.Error())
-	}
-
 	if err := api.store.MakeBucket(ctx.Context(), bucketName.String(), minio.MakeBucketOptions{Region: "EUROPE-WEST2"}); err != nil {
 		exists, errBucketExists := api.store.BucketExists(ctx.Context(), bucketName.String())
 
@@ -66,10 +61,6 @@ func (api *API) CreateBucket(ctx *fiber.Ctx) error {
 		}
 
 		return utils.NewException(utils.ErrorBucketCreation, fiber.StatusBadRequest, err.Error())
-	}
-
-	if err := api.store.SetBucketPolicy(ctx.Context(), bucketName.String(), policy); err != nil {
-		return utils.NewException(utils.ErrorBucketPolicyFail, fiber.StatusBadRequest, err.Error())
 	}
 
 	bucket.Bucket = nulls.NewString(bucketName.String())
@@ -85,5 +76,11 @@ func (api *API) CreateBucket(ctx *fiber.Ctx) error {
 
 	return ctx.JSON(fiber.Map{
 		"data": bucket,
+	})
+}
+
+func (api *API) PutObject(ctx *fiber.Ctx) error {
+	return ctx.JSON(fiber.Map{
+		"data": "object",
 	})
 }
