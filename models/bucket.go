@@ -6,6 +6,8 @@ import (
 
 	"github.com/gobuffalo/pop/nulls"
 	"github.com/gobuffalo/uuid"
+	"github.com/gobuffalo/validate/v3"
+	"github.com/gobuffalo/validate/v3/validators"
 	"github.com/gosimple/slug"
 	"github.com/pkg/errors"
 	"github.com/websublime/barrel/storage"
@@ -16,7 +18,7 @@ import (
 type Bucket struct {
 	ID        uuid.UUID    `json:"id" db:"id"`
 	Name      string       `json:"name" db:"name"`
-	Bucket    nulls.String `json:"path,omitempty" db:"bucket"`
+	Bucket    nulls.String `json:"bucket,omitempty" db:"bucket"`
 	OrgID     nulls.String `json:"orgId,omitempty" db:"org_id"`
 	IsPrivate bool         `json:"isPrivate" db:"is_private"`
 	Policy    string       `json:"policy" db:"-"`
@@ -57,6 +59,13 @@ func (b *Bucket) BeforeSave(tx *storage.Connection) error {
 	}
 
 	return nil
+}
+
+func (b *Bucket) Validate() *validate.Errors {
+	return validate.Validate(
+		&validators.StringIsPresent{Field: b.Name, Name: "Name", Message: "Bucket name is missing"},
+		&validators.StringIsPresent{Field: b.Bucket.String, Name: "Bucket", Message: "Bucket folder name is missing"},
+	)
 }
 
 func FindBucket(tx *storage.Connection, bucket string) (*Bucket, error) {

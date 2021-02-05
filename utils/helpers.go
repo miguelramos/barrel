@@ -2,10 +2,13 @@ package utils
 
 const (
 	ErrorServerUnknown           = "ESERVER_UNKNOWN"
+	ErrorUserCreation            = "EUSER_CREATEFORBIDDEN"
+	ErrorUserBodyParse           = "EUSER_BODYPARSE"
 	ErrorBucketModel             = "EBUCKET_MODEL"
 	ErrorBucketBodyParse         = "EBUCKET_BODYPARSE"
 	ErrorBucketExist             = "EBUCKET_EXIST"
 	ErrorBucketCreation          = "EBUCKET_CREATE"
+	ErrorBucketPolicyFail        = "EBUCKET_POLICYFAIL"
 	ErrorBucketCreationForbidden = "EBUCKET_CREATEFORBIDDEN"
 	ErrorBucketModelSave         = "EBUCKET_MODELSAVE"
 	ErrorBucketModelTransaction  = "EBUCKET_MODELTRANSACTION"

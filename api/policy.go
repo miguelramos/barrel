@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/minio/minio/pkg/bucket/policy"
+	"github.com/minio/minio/pkg/bucket/policy/condition"
 	iampolicy "github.com/minio/minio/pkg/iam/policy"
 	"github.com/pkg/errors"
 )
@@ -36,7 +38,7 @@ func GetPolicyType(policy string) PolicyType {
 }
 
 // CreatePolicy create one of the Policy types
-func CreatePolicy(policy PolicyType, bucket string) (*iampolicy.Policy, error) {
+func CreatePolicy(policy PolicyType, bucket string) (*iampolicy.Policy, string, error) {
 	switch policy {
 	case AnonymousPolicy:
 		return CreateAnonymousPolicy(bucket)
@@ -52,33 +54,48 @@ func CreatePolicy(policy PolicyType, bucket string) (*iampolicy.Policy, error) {
 		return CreateAdminPolicy(bucket)
 	}
 
-	return nil, errors.New("Invalid policy type")
+	return nil, "", errors.New("Invalid policy type")
 }
 
 // CreateAnonymousPolicy read-only bucket objects
-func CreateAnonymousPolicy(bucket string) (*iampolicy.Policy, error) {
+func CreateAnonymousPolicy(bucket string) (*iampolicy.Policy, string, error) {
 	policyString := fmt.Sprintf(`{
 		"Version": "2012-10-17",
 		"Statement": [{
 			"Action": [
-				"s3:GetBucketLocation",
 				"s3:GetObject"
 			],
-			"Resource": ["%s/*"],
+			"Effect": "Allow",
+			"Principal": {"AWS": ["*"]},
+			"Resource": ["arn:aws:s3:::%s/*"],
 			"Sid": ""
 		}]
 	}`, bucket)
 
-	policy, err := iampolicy.ParseConfig(strings.NewReader(policyString))
-	if err != nil {
-		return nil, errors.Wrap(err, "Unable to parse policy")
+	p := iampolicy.Policy{
+		Version: iampolicy.DefaultVersion,
+		Statements: []iampolicy.Statement{
+			iampolicy.NewStatement(
+				policy.Allow,
+				iampolicy.NewActionSet(iampolicy.GetObjectAction),
+				iampolicy.NewResourceSet(iampolicy.NewResource(fmt.Sprintf("%s/*", bucket), "")),
+				condition.NewFunctions(),
+			),
+		},
 	}
 
-	return policy, nil
+	fmt.Print(p.Validate())
+
+	policy, err := iampolicy.ParseConfig(strings.NewReader(policyString))
+	if err != nil {
+		return nil, policyString, errors.Wrap(err, err.Error())
+	}
+
+	return policy, policyString, nil
 }
 
 // CreateReaderPolicy read objects, tagging and list
-func CreateReaderPolicy(bucket string) (*iampolicy.Policy, error) {
+func CreateReaderPolicy(bucket string) (*iampolicy.Policy, string, error) {
 	policyString := fmt.Sprintf(`{
 		"Version": "2012-10-17",
 		"Statement": [{
@@ -96,14 +113,14 @@ func CreateReaderPolicy(bucket string) (*iampolicy.Policy, error) {
 
 	policy, err := iampolicy.ParseConfig(strings.NewReader(policyString))
 	if err != nil {
-		return nil, errors.Wrap(err, "Unable to parse policy")
+		return nil, policyString, errors.Wrap(err, "Unable to parse policy")
 	}
 
-	return policy, nil
+	return policy, policyString, nil
 }
 
 // CreateWriterPolicy reads and write objects, tagging
-func CreateWriterPolicy(bucket string) (*iampolicy.Policy, error) {
+func CreateWriterPolicy(bucket string) (*iampolicy.Policy, string, error) {
 	policyString := fmt.Sprintf(`{
 		"Version": "2012-10-17",
 		"Statement": [{
@@ -124,14 +141,14 @@ func CreateWriterPolicy(bucket string) (*iampolicy.Policy, error) {
 
 	policy, err := iampolicy.ParseConfig(strings.NewReader(policyString))
 	if err != nil {
-		return nil, errors.Wrap(err, "Unable to parse policy")
+		return nil, policyString, errors.Wrap(err, "Unable to parse policy")
 	}
 
-	return policy, nil
+	return policy, policyString, nil
 }
 
 // CreateManagerPolicy manage get,delete, put and notifications
-func CreateManagerPolicy(bucket string) (*iampolicy.Policy, error) {
+func CreateManagerPolicy(bucket string) (*iampolicy.Policy, string, error) {
 	policyString := fmt.Sprintf(`{
 		"Version": "2012-10-17",
 		"Statement": [{
@@ -156,14 +173,14 @@ func CreateManagerPolicy(bucket string) (*iampolicy.Policy, error) {
 
 	policy, err := iampolicy.ParseConfig(strings.NewReader(policyString))
 	if err != nil {
-		return nil, errors.Wrap(err, "Unable to parse policy")
+		return nil, policyString, errors.Wrap(err, "Unable to parse policy")
 	}
 
-	return policy, nil
+	return policy, policyString, nil
 }
 
 // CreateOwnerPolicy manage bucket
-func CreateOwnerPolicy(bucket string) (*iampolicy.Policy, error) {
+func CreateOwnerPolicy(bucket string) (*iampolicy.Policy, string, error) {
 	policyString := fmt.Sprintf(`{
 		"Version": "2012-10-17",
 		"Statement": [{
@@ -192,14 +209,14 @@ func CreateOwnerPolicy(bucket string) (*iampolicy.Policy, error) {
 
 	policy, err := iampolicy.ParseConfig(strings.NewReader(policyString))
 	if err != nil {
-		return nil, errors.Wrap(err, "Unable to parse policy")
+		return nil, policyString, errors.Wrap(err, "Unable to parse policy")
 	}
 
-	return policy, nil
+	return policy, policyString, nil
 }
 
 // CreateAdminPolicy all s3:+ roles
-func CreateAdminPolicy(bucket string) (*iampolicy.Policy, error) {
+func CreateAdminPolicy(bucket string) (*iampolicy.Policy, string, error) {
 	policyString := fmt.Sprintf(`{
 		"Version": "2012-10-17",
 		"Statement": [{
@@ -213,8 +230,8 @@ func CreateAdminPolicy(bucket string) (*iampolicy.Policy, error) {
 
 	policy, err := iampolicy.ParseConfig(strings.NewReader(policyString))
 	if err != nil {
-		return nil, errors.Wrap(err, "Unable to parse policy")
+		return nil, policyString, errors.Wrap(err, "Unable to parse policy")
 	}
 
-	return policy, nil
+	return policy, policyString, nil
 }
