@@ -45,4 +45,7 @@ func NewPrivateAPI(api *API, router fiber.Router) {
 
 	userRouter := router.Group("/user")
 	userRouter.Post("", api.CreateUser)
+
+	policyRouter := router.Group("/policy")
+	policyRouter.Post("", api.CreateCannedPolicy)
 }

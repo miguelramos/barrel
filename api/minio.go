@@ -22,7 +22,15 @@ func (api *API) CreateUser(ctx *fiber.Ctx) error {
 		return utils.NewException(utils.ErrorUserBodyParse, fiber.StatusPreconditionFailed, "Invalid request body parser")
 	}
 
+	if err := identity.Validate(); len(err.Errors) > 0 {
+		return utils.NewException(utils.ErrorUserBodyParse, fiber.StatusPreconditionFailed, err.Error())
+	}
+
+	if err := config.CreateOrgUser(api.config, identity.AccessKey, identity.SecretKey); err != nil {
+		return utils.NewException(utils.ErrorOrgUserFailure, fiber.StatusBadRequest, err.Error())
+	}
+
 	return ctx.JSON(fiber.Map{
-		"data": "identity",
+		"data": identity,
 	})
 }

@@ -2,6 +2,8 @@ package config
 
 import (
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gobuffalo/validate"
+	"github.com/gobuffalo/validate/validators"
 	"github.com/gofrs/uuid"
 )
 
@@ -15,6 +17,13 @@ type GoTrueClaims struct {
 type Identity struct {
 	AccessKey string `json:"accessKey,omitempty"`
 	SecretKey string `json:"secretKey,omitempty"`
+}
+
+func (identity *Identity) Validate() *validate.Errors {
+	return validate.Validate(
+		&validators.StringIsPresent{Field: identity.AccessKey, Name: "AccessKey", Message: "Identity accessKey is missing"},
+		&validators.StringIsPresent{Field: identity.SecretKey, Name: "SecretKey", Message: "Identity secretKey is missing"},
+	)
 }
 
 type GoTrueIdentity struct {

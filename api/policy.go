@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/minio/minio/pkg/bucket/policy"
 	"github.com/minio/minio/pkg/bucket/policy/condition"
 	iampolicy "github.com/minio/minio/pkg/iam/policy"
@@ -234,4 +235,10 @@ func CreateAdminPolicy(bucket string) (*iampolicy.Policy, string, error) {
 	}
 
 	return policy, policyString, nil
+}
+
+func (api *API) CreateCannedPolicy(ctx *fiber.Ctx) error {
+	return ctx.JSON(fiber.Map{
+		"data": "canned",
+	})
 }

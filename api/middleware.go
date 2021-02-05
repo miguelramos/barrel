@@ -82,11 +82,18 @@ func (api *API) AdminMiddleware(ctx *fiber.Ctx) error {
 	return ctx.Next()
 }
 
+//CanAccessMiddleware check if user is register to access private endpoints
 func (api *API) CanAccessMiddleware(ctx *fiber.Ctx) error {
 	isAdmin := ctx.Locals("admin").(bool)
+	headerKey := ctx.Get("X-BARREL-KEY")
 
 	if !isAdmin {
-		config.UserIsRegister(api.config)
+		user, err := config.UserIsRegister(api.config, headerKey)
+		if err != nil {
+			return err
+		}
+
+		ctx.Locals("user", user)
 	}
 
 	return ctx.Next()

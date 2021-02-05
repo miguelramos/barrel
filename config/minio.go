@@ -2,11 +2,12 @@ package config
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	madmin "github.com/minio/minio/pkg/madmin"
+	"github.com/websublime/barrel/utils"
 )
 
 // OpenClient open minio client connection
@@ -48,14 +49,29 @@ func NewClient(conf *EnvironmentConfig, key string, secret string, token string)
 	return minioClient, nil
 }
 
-func UserIsRegister(conf *EnvironmentConfig) {
+func UserIsRegister(conf *EnvironmentConfig, key string) (*madmin.UserInfo, error) {
 	admin, _ := OpenAdminClient(conf)
 
-	users, _ := admin.ListUsers(context.Background())
+	users, err := admin.ListUsers(context.Background())
+	if err != nil {
+		return nil, err
+	}
 
-	fmt.Print(users)
+	user, ok := users[key]
+	if !ok {
+		return nil, utils.NewException(utils.ErrorOrgStatusForbidden, fiber.StatusForbidden, "User not found")
+	}
+
+	return &user, nil
 }
 
-func CreateOrgPolicy(conf *EnvironmentConfig) {
+func CreateOrgUser(conf *EnvironmentConfig, accessKey string, secretKey string) error {
 	// https://github.com/minio/minio/blob/master/pkg/madmin/examples/add-user-and-policy.go
+	admin, _ := OpenAdminClient(conf)
+
+	if err := admin.AddUser(context.Background(), accessKey, secretKey); err != nil {
+		return err
+	}
+
+	return nil
 }
