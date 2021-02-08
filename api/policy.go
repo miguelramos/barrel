@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/minio/minio/pkg/bucket/policy"
 	"github.com/minio/minio/pkg/bucket/policy/condition"
 	iampolicy "github.com/minio/minio/pkg/iam/policy"
@@ -107,7 +106,9 @@ func CreateReaderPolicy(bucket string) (*iampolicy.Policy, string, error) {
 				"s3:GetBucketTagging",
 				"s3:GetObjectTagging"
 			],
-			"Resource": ["%s/*"],
+			"Effect": "Allow",
+			"Principal": {"AWS": ["*"]},
+			"Resource": ["arn:aws:s3:::%s/*"],
 			"Sid": ""
 		}]
 	}`, bucket)
@@ -135,7 +136,9 @@ func CreateWriterPolicy(bucket string) (*iampolicy.Policy, string, error) {
 				"s3:PutBucketTagging",
 				"s3:PutObject"
 			],
-			"Resource": ["%s/*"],
+			"Effect": "Allow",
+			"Principal": {"AWS": ["*"]},
+			"Resource": ["arn:aws:s3:::%s/*"],
 			"Sid": ""
 		}]
 	}`, bucket)
@@ -164,10 +167,12 @@ func CreateManagerPolicy(bucket string) (*iampolicy.Policy, string, error) {
 				"s3:PutObject",
 				"s3:DeleteObject",
 				"s3:DeleteObjectTagging",
-				"s3:GetBucketVersioning"
+				"s3:GetBucketVersioning",
 				"s3:ListenNotification"
 			],
-			"Resource": ["%s/*"],
+			"Effect": "Allow",
+			"Principal": {"AWS": ["*"]},
+			"Resource": ["arn:aws:s3:::%s/*"],
 			"Sid": ""
 		}]
 	}`, bucket)
@@ -200,10 +205,12 @@ func CreateOwnerPolicy(bucket string) (*iampolicy.Policy, string, error) {
 				"s3:PutObject",
 				"s3:DeleteObject",
 				"s3:DeleteObjectTagging",
-				"s3:GetBucketVersioning"
+				"s3:GetBucketVersioning",
 				"s3:ListenNotification"
 			],
-			"Resource": ["%s/*"],
+			"Effect": "Allow",
+			"Principal": {"AWS": ["*"]},
+			"Resource": ["arn:aws:s3:::%s/*"],
 			"Sid": ""
 		}]
 	}`, bucket)
@@ -224,7 +231,9 @@ func CreateAdminPolicy(bucket string) (*iampolicy.Policy, string, error) {
 			"Action": [
 				"s3:*"
 			],
-			"Resource": ["%s/*"],
+			"Effect": "Allow",
+			"Principal": {"AWS": ["*"]},
+			"Resource": ["arn:aws:s3:::%s/*"],
 			"Sid": ""
 		}]
 	}`, bucket)
@@ -235,10 +244,4 @@ func CreateAdminPolicy(bucket string) (*iampolicy.Policy, string, error) {
 	}
 
 	return policy, policyString, nil
-}
-
-func (api *API) CreateCannedPolicy(ctx *fiber.Ctx) error {
-	return ctx.JSON(fiber.Map{
-		"data": "canned",
-	})
 }

@@ -42,10 +42,13 @@ func NewPrivateAPI(api *API, router fiber.Router) {
 
 	bucketRouter := router.Group("/bucket")
 	bucketRouter.Post("", api.CreateBucket)
+	bucketRouter.Post("/upload", api.PutObject)
 
 	userRouter := router.Group("/user")
 	userRouter.Post("", api.CreateUser)
+	userRouter.Post("/policy", api.CreateUserPolicy)
 
 	policyRouter := router.Group("/policy")
-	policyRouter.Post("", api.CreateCannedPolicy)
+	policyRouter.Post("", api.SetPolicy)
+	policyRouter.Post("/canned", api.CreateCannedPolicy)
 }

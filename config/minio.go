@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	iampolicy "github.com/minio/minio/pkg/iam/policy"
 	madmin "github.com/minio/minio/pkg/madmin"
 	"github.com/websublime/barrel/utils"
 )
@@ -70,6 +71,26 @@ func CreateOrgUser(conf *EnvironmentConfig, accessKey string, secretKey string) 
 	admin, _ := OpenAdminClient(conf)
 
 	if err := admin.AddUser(context.Background(), accessKey, secretKey); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func CreateCannedPolicy(conf *EnvironmentConfig, name string, policy *iampolicy.Policy) error {
+	admin, _ := OpenAdminClient(conf)
+
+	if err := admin.AddCannedPolicy(context.Background(), name, policy); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func CreateUserPolicy(conf *EnvironmentConfig, key string, policy string) error {
+	admin, _ := OpenAdminClient(conf)
+
+	if err := admin.SetPolicy(context.Background(), policy, key, false); err != nil {
 		return err
 	}
 
