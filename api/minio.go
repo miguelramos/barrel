@@ -3,6 +3,8 @@ package api
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/websublime/barrel/config"
+	"github.com/websublime/barrel/models"
+	"github.com/websublime/barrel/storage"
 	"github.com/websublime/barrel/utils"
 )
 
@@ -16,7 +18,10 @@ func (api *API) CreateUser(ctx *fiber.Ctx) error {
 		return utils.NewException(utils.ErrorUserCreation, fiber.StatusForbidden, "Creation permission denied")
 	}
 
-	identity := new(config.Identity)
+	identity, err := models.NewIdentity("", "", isAdmin)
+	if err != nil {
+		return utils.NewException(utils.ErrorOrgUserFailure, fiber.StatusBadRequest, err.Error())
+	}
 
 	if err := ctx.BodyParser(identity); err != nil {
 		return utils.NewException(utils.ErrorUserBodyParse, fiber.StatusPreconditionFailed, "Invalid request body parser")
@@ -28,6 +33,15 @@ func (api *API) CreateUser(ctx *fiber.Ctx) error {
 
 	if err := config.CreateOrgUser(api.config, identity.AccessKey, identity.SecretKey); err != nil {
 		return utils.NewException(utils.ErrorOrgUserFailure, fiber.StatusBadRequest, err.Error())
+	}
+
+	err = api.db.Transaction(func(tx *storage.Connection) error {
+		terr := tx.Create(identity)
+
+		return terr
+	})
+	if err != nil {
+		return utils.NewException(utils.ErrorResourceModelSave, fiber.StatusBadRequest, err.Error())
 	}
 
 	return ctx.JSON(fiber.Map{

@@ -39,6 +39,7 @@ func Dial(conf *config.EnvironmentConfig) (*Connection, error) {
 	if logrus.StandardLogger().Level == logrus.DebugLevel {
 		pop.Debug = true
 	}
+	pop.Debug = true
 
 	return &Connection{db}, nil
 }

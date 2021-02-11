@@ -84,6 +84,18 @@ CREATE TABLE auth.identities (
 	user_id uuid NOT NULL,
 	CONSTRAINT identities_pkey PRIMARY KEY (id)
 );
+-- auth.templates definition
+CREATE TABLE auth.templates
+(
+	id uuid NOT NULL,
+	aud varchar(255),
+	type varchar(50),
+	subject text,
+	url text DEFAULT '/',
+  base_url varchar(255),
+  url_template text,
+  CONSTRAINT templates_pkey PRIMARY KEY (id)
+);
 -- Gets the User ID from the request cookie
 create or replace function auth.uid() returns uuid as $$
   select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid;
@@ -92,6 +104,7 @@ $$ language sql stable;
 create or replace function auth.role() returns text as $$
   select nullif(current_setting('request.jwt.claim.role', true), '')::text;
 $$ language sql stable;
+
 GRANT ALL PRIVILEGES ON SCHEMA auth TO postgres;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA auth TO postgres;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA auth TO postgres;

@@ -3,6 +3,7 @@ module github.com/websublime/barrel
 go 1.15
 
 require (
+	github.com/barasher/go-exiftool v1.3.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gobuffalo/pop v4.13.1+incompatible
 	github.com/gobuffalo/pop/v5 v5.3.3

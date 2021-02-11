@@ -5,6 +5,7 @@ const (
 	ErrorUserCreation            = "EUSER_CREATEFORBIDDEN"
 	ErrorUserBodyParse           = "EUSER_BODYPARSE"
 	ErrorBucketModel             = "EBUCKET_MODEL"
+	ErrorBucketMissing           = "EBUCKET_MISSING"
 	ErrorBucketBodyParse         = "EBUCKET_BODYPARSE"
 	ErrorBucketExist             = "EBUCKET_EXIST"
 	ErrorBucketCreation          = "EBUCKET_CREATE"
@@ -23,6 +24,11 @@ const (
 	ErrorParseJson               = "EJSON_PARSE"
 	ErrorResourceForbidden       = "ERESOURCE_FORBIDDEN"
 	ErrorResourceInvalidBody     = "ERESOURCE_BODYINVALID"
+	ErrorResourceInvalidForm     = "ERESOURCE_FORMINVALID"
+	ErrorResourceMetaFailure     = "ERESOURCE_METAFAILURE"
+	ErrorResourceBucketFailure   = "ERESOURCE_BUCKETFAILURE"
+	ErrorResourceModelSave       = "ERESOURCE_MODELSAVE"
+	ErrorExifMissing             = "EEXIF_MISSING"
 )
 
 // Contains checks if a string is present in a slice

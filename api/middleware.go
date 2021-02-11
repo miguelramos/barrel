@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 	"github.com/websublime/barrel/config"
+	"github.com/websublime/barrel/models"
 	"github.com/websublime/barrel/utils"
 )
 
@@ -42,7 +43,7 @@ func (api *API) AuthorizedMiddleware(ctx *fiber.Ctx) error {
 		}
 
 		ctx.Locals("claims", claims)
-		ctx.Locals("token", auth)
+		ctx.Locals("token", token)
 	} else {
 		return utils.NewException(utils.ErrorOrgStatusForbidden, fiber.StatusForbidden, "Only authorized requests are permitted")
 	}
@@ -57,7 +58,14 @@ func (api *API) AdminMiddleware(ctx *fiber.Ctx) error {
 
 	headerKey := ctx.Get("X-BARREL-KEY")
 
-	if len(headerKey) > 0 && strings.Compare(headerKey, api.config.BarrelAdminKey) == 0 {
+	identity, err := models.FindIdentityByKey(api.db, headerKey)
+	if err != nil {
+		return utils.NewException(utils.ErrorOrgStatusForbidden, fiber.StatusForbidden, err.Error())
+	}
+
+	if identity.IsAdmin {
+		isAdmin = true
+	} else if len(headerKey) > 0 && strings.Compare(headerKey, api.config.BarrelAdminKey) == 0 {
 		isAdmin = true
 	} else {
 		claimer := ctx.Locals("claims").(*config.GoTrueClaims)
@@ -85,13 +93,26 @@ func (api *API) AdminMiddleware(ctx *fiber.Ctx) error {
 //CanAccessMiddleware check if user is register to access private endpoints
 func (api *API) CanAccessMiddleware(ctx *fiber.Ctx) error {
 	isAdmin := ctx.Locals("admin").(bool)
+	token := ctx.Locals("token").(*jwt.Token)
 	headerKey := ctx.Get("X-BARREL-KEY")
+
+	identity, err := models.FindIdentityByKey(api.db, headerKey)
+	if err != nil {
+		return utils.NewException(utils.ErrorOrgStatusForbidden, fiber.StatusForbidden, err.Error())
+	}
 
 	if !isAdmin {
 		user, err := config.UserIsRegister(api.config, headerKey)
 		if err != nil {
 			return err
 		}
+
+		if user.Status == "disabled" {
+			return utils.NewException(utils.ErrorOrgStatusForbidden, fiber.StatusForbidden, "User is disabled")
+		}
+		// TODO: we need to save user key/secret on database
+		client, _ := config.NewClient(api.config, identity.AccessKey, identity.SecretKey, token.Raw)
+		api.store = client
 
 		ctx.Locals("user", user)
 	}
