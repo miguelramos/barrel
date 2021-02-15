@@ -16,15 +16,16 @@ import (
 
 // Bucket model type
 type Bucket struct {
-	ID        uuid.UUID    `json:"id" db:"id"`
-	Name      string       `json:"name" db:"name"`
-	Bucket    nulls.String `json:"bucket,omitempty" db:"bucket"`
-	OrgID     nulls.String `json:"orgId,omitempty" db:"org_id"`
-	IsPrivate bool         `json:"isPrivate" db:"is_private"`
-	Policy    string       `json:"policy" db:"-"`
-	CreatedAt time.Time    `json:"createdAt" db:"created_at"`
-	UpdatedAt time.Time    `json:"updatedAt" db:"updated_at"`
-	DeletedAt nulls.Time   `json:"deleteAt,omitempty" db:"deleted_at"`
+	ID          uuid.UUID      `json:"id" db:"id"`
+	Name        string         `json:"name" db:"name"`
+	Bucket      nulls.String   `json:"bucket,omitempty" db:"bucket"`
+	OrgID       nulls.String   `json:"orgId,omitempty" db:"org_id"`
+	IsPrivate   bool           `json:"isPrivate" db:"is_private"`
+	Policy      string         `json:"policy" db:"-"`
+	CreatedAt   time.Time      `json:"createdAt" db:"created_at"`
+	UpdatedAt   time.Time      `json:"updatedAt" db:"updated_at"`
+	DeletedAt   nulls.Time     `json:"deleteAt,omitempty" db:"deleted_at"`
+	BucketMedia []*BucketMedia `json:"medias,omitempty" many_to_many:"bucket_media" db:"-" fk_id:"bucket_id"`
 }
 
 // NewBucket creates new Bucket

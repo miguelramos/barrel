@@ -14,23 +14,12 @@ type GoTrueClaims struct {
 	UserMetaData map[string]interface{} `json:"user_metadata"`
 }
 
-type Identity struct {
-	AccessKey string `json:"accessKey,omitempty"`
-	SecretKey string `json:"secretKey,omitempty"`
-}
-
-func (identity *Identity) Validate() *validate.Errors {
-	return validate.Validate(
-		&validators.StringIsPresent{Field: identity.AccessKey, Name: "AccessKey", Message: "Identity accessKey is missing"},
-		&validators.StringIsPresent{Field: identity.SecretKey, Name: "SecretKey", Message: "Identity secretKey is missing"},
-	)
-}
-
 type GoTrueIdentity struct {
-	Identity
-	ID     uuid.UUID `json:"id,omitempty"`
-	UserID uuid.UUID `json:"userID,omitempty"`
-	Token  string    `json:"token,omitempty"`
+	AccessKey string    `json:"accessKey,omitempty"`
+	SecretKey string    `json:"secretKey,omitempty"`
+	ID        uuid.UUID `json:"id,omitempty"`
+	UserID    uuid.UUID `json:"userID,omitempty"`
+	Token     string    `json:"token,omitempty"`
 }
 
 type CannedPolicy struct {

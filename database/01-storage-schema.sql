@@ -35,5 +35,12 @@ CREATE  TABLE "barrel".bucket_media (
  );
 
 ALTER TABLE "barrel".bucket_media ADD CONSTRAINT fk_bucket_media_bucket FOREIGN KEY ( bucket_id ) REFERENCES "barrel".buckets( id );
-
 ALTER TABLE "barrel".bucket_media ADD CONSTRAINT fk_bucket_media_media FOREIGN KEY ( media_id ) REFERENCES "barrel".medias( id );
+
+CREATE TABLE "barrel".identities (
+	id 									uuid NOT NULL ,
+	"secret" 						text NOT NULL ,
+	"key" 							text NOT NULL ,
+	is_admin						boolean DEFAULT false ,
+	CONSTRAINT pk_users_id PRIMARY KEY (id)
+);

@@ -39,7 +39,7 @@ func OpenAdminClient(conf *EnvironmentConfig) (*madmin.AdminClient, error) {
 // NewClient create a new client connection
 func NewClient(conf *EnvironmentConfig, key string, secret string, token string) (*minio.Client, error) {
 	minioClient, err := minio.New(conf.BarrelMinioURL, &minio.Options{
-		Creds:  credentials.NewStaticV4(key, secret, token),
+		Creds:  credentials.NewStaticV4(key, secret, ""),
 		Secure: false,
 	})
 
